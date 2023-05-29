@@ -36,7 +36,67 @@ class CreateCinemaSchema extends Migration
      */
     public function up()
     {
-        throw new \Exception('implement in coding task 4, you can ignore this exception if you are just running the initial migrations.');
+        Schema::create('movies', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->integer('duration');
+            $table->timestamp('release_date');
+            $table->timestamps();
+        });
+
+        Schema::create('rooms', function (Blueprint $table) {
+            $table->id();
+            $table->integer('total_seats');          
+            $table->timestamps();
+        });
+
+        Schema::create('shows', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->timestamp('start_time');
+            $table->timestamp('end_time');
+            $table->integer('total_seats');
+
+            $table->unsignedBigInteger('movie_id');
+            $table->unsignedBigInteger('room_id');
+            
+            $table->foreign('movie_id')->references('id')->on('movies');
+          
+            $table->timestamps();
+        });
+
+
+        Schema::create('pricing', function (Blueprint $table) {
+            $table->id();
+            $table->float('price');
+
+            $table->unsignedBigInteger('show_id');
+            $table->foreign('show_id')->references('id')->on('shows');
+            $table->string('seat_type');
+            $table->timestamps();
+        });
+
+        Schema::create('seats', function (Blueprint $table) {
+            $table->id();
+            $table->enum('type', ['regular', 'premimum']);
+            $table->string('is_booked');
+            $table->unsignedBigInteger('show_id');
+            $table->foreign('show_id')->references('id')->on('shows');
+          
+            $table->timestamps();
+        });
+
+        Schema::create('Bookings', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('show_id');
+            $table->unsignedBigInteger('seat_id');
+            $table->unsignedBigInteger('user_id');
+            $table->foreign('show_id')->references('id')->on('shows');
+            $table->foreign('seat_id')->references('id')->on('seats');
+            $table->foreign('user_id')->references('id')->on('users');
+          
+            $table->timestamps();
+        });
     }
 
     /**
