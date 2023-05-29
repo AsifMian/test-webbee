@@ -100,10 +100,15 @@ class EventsController extends BaseController
     ]
      */
 
-    public function getEventsWithWorkshops() {
-        throw new \Exception('implement in coding task 1');
+     public function getEventsWithWorkshops() {
+        $envents = Event::with('workshops')->get();
+        
+        // instead of using get() to fetch all records here i would like to paginate the results 
+        //in case we have thousands of results if application grows so application does not crash
+        
+        return response()->json($envents);
+        // Alternatively we can use resource class here to transform valuse for simplicity i am skipping that here
     }
-
 
     /* TODO: complete getFutureEventWithWorkshops so that it returns events with workshops, that have not yet started
     Requirements:
@@ -178,7 +183,15 @@ class EventsController extends BaseController
     ```
      */
 
-    public function getFutureEventsWithWorkshops() {
-        throw new \Exception('implement in coding task 2');
+     public function getFutureEventsWithWorkshops() {
+        
+        $envents = Event::with('workshops')
+                        ->whereHas('workshops', function($query) {
+                            $query->where('start', '>',  \Carbon\Carbon::now()->toDateTimeString()); // '=' is optional
+                    })->get();
+
+        //behind the scenes i will run max two quries as we are eager loading here
+
+        return response()->json($envents);
     }
 }
